@@ -65,13 +65,13 @@ pub fn build(b: *std.Build) void {
         }),
     });
 
-    byacc_exe.addConfigHeader(byacc_config);
-    byacc_exe.addCSourceFiles(.{
+    byacc_exe.root_module.addConfigHeader(byacc_config);
+    byacc_exe.root_module.addCSourceFiles(.{
         .root = upstream_dep.path("."),
         .files = byacc_sources,
         .flags = cflags,
     });
-    byacc_exe.addCSourceFile(.{
+    byacc_exe.root_module.addCSourceFile(.{
         // "$(SKELETON).c",
         .file = if (backtracking)
             upstream_dep.path("btyaccpar.c")

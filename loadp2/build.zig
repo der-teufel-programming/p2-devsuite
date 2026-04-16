@@ -131,7 +131,7 @@ pub fn build(b: *std.Build) void {
         loadp2_exe.root_module.addIncludePath(header.dirname());
     }
 
-    loadp2_exe.addCSourceFiles(.{
+    loadp2_exe.root_module.addCSourceFiles(.{
         .root = upstream,
         .files = loadp2_sources ++ u9fs_sources ++ &[_][]const u8{os_file},
         .flags = cflags,

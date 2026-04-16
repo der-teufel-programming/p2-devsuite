@@ -2,18 +2,23 @@ const std = @import("std");
 
 const line_length = 12;
 
-pub fn main() !void {
-    var mem = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-    const allocator = mem.allocator();
+pub fn main(init: std.process.Init) !void {
+    const allocator = init.gpa;
 
-    const argv = try std.process.argsAlloc(allocator);
+    var args = try std.process.Args.Iterator.initAllocator(init.minimal.args, allocator);
+    defer args.deinit();
 
-    if (argv.len != 3)
+    _ = args.next() orelse @panic("invalid arguments. requries fake-xxd <input> <output>");
+    const input_path = args.next() orelse @panic("invalid arguments. requries fake-xxd <input> <output>");
+    const output_path = args.next() orelse @panic("invalid arguments. requries fake-xxd <input> <output>");
+    if (args.next() != null)
         @panic("invalid arguments. requries fake-xxd <input> <output>");
 
-    const blob = try std.fs.cwd().readFileAlloc(allocator, argv[1], 1 << 20);
+    const blob = try std.Io.Dir.cwd().readFileAlloc(init.io, input_path, allocator, .limited(1 << 20));
+    defer allocator.free(blob);
 
-    const symbol_name = try allocator.dupe(u8, std.fs.path.basename(argv[1]));
+    const symbol_name = try allocator.dupe(u8, std.Io.Dir.path.basename(input_path));
+    defer allocator.free(symbol_name);
 
     for (symbol_name) |*c| {
         c.* = switch (c.*) {
@@ -23,10 +28,11 @@ pub fn main() !void {
     }
 
     var output_buffer: [1024]u8 = undefined;
-    var output = try std.fs.cwd().atomicFile(argv[2], .{ .write_buffer = &output_buffer });
-    defer output.deinit();
+    var output = try std.Io.Dir.cwd().createFileAtomic(init.io, output_path, .{ .replace = true });
+    defer output.deinit(init.io);
 
-    const writer = &output.file_writer.interface;
+    var file_writer = output.file.writer(init.io, &output_buffer);
+    const writer = &file_writer.interface;
 
     try writer.print("unsigned char {s}[] = {{\n", .{symbol_name});
 
@@ -49,7 +55,8 @@ pub fn main() !void {
 
     try writer.print("}};\nunsigned int {s}_len = {d};\n", .{ symbol_name, blob.len });
 
-    try output.finish();
+    try file_writer.flush();
+    try output.replace(init.io);
 
     //
 

@@ -94,7 +94,7 @@ pub fn build(b: *std.Build) void {
         for (compile_defines) |define|
             testlex_exe.root_module.addCMacro(define, "");
 
-        testlex_exe.addCSourceFiles(.{
+        testlex_exe.root_module.addCSourceFiles(.{
             .root = upstream,
             .files = lex_sources ++ &[_][]const u8{"testlex.c"},
             .flags = cflags,
@@ -119,15 +119,15 @@ pub fn build(b: *std.Build) void {
         for (compile_defines) |define|
             spin2cpp_exe.root_module.addCMacro(define, "");
 
-        spin2cpp_exe.addCSourceFiles(.{
+        spin2cpp_exe.root_module.addCSourceFiles(.{
             .root = upstream,
             .files = spin_sources ++ &[_][]const u8{ "spin2cpp.c", "cmdline.c" },
             .flags = cflags,
         });
 
-        spin2cpp_exe.addCSourceFile(.{ .file = spin_tab_c, .flags = cflags });
-        spin2cpp_exe.addCSourceFile(.{ .file = basic_tab_c, .flags = cflags });
-        spin2cpp_exe.addCSourceFile(.{ .file = cgram_tab_c, .flags = cflags });
+        spin2cpp_exe.root_module.addCSourceFile(.{ .file = spin_tab_c, .flags = cflags });
+        spin2cpp_exe.root_module.addCSourceFile(.{ .file = basic_tab_c, .flags = cflags });
+        spin2cpp_exe.root_module.addCSourceFile(.{ .file = cgram_tab_c, .flags = cflags });
 
         b.installArtifact(spin2cpp_exe);
     }
@@ -148,15 +148,15 @@ pub fn build(b: *std.Build) void {
         for (compile_defines) |define|
             flexspin_exe.root_module.addCMacro(define, "");
 
-        flexspin_exe.addCSourceFiles(.{
+        flexspin_exe.root_module.addCSourceFiles(.{
             .root = upstream,
             .files = spin_sources ++ &[_][]const u8{ "flexspin.c", "cmdline.c" },
             .flags = cflags,
         });
 
-        flexspin_exe.addCSourceFile(.{ .file = spin_tab_c, .flags = cflags });
-        flexspin_exe.addCSourceFile(.{ .file = basic_tab_c, .flags = cflags });
-        flexspin_exe.addCSourceFile(.{ .file = cgram_tab_c, .flags = cflags });
+        flexspin_exe.root_module.addCSourceFile(.{ .file = spin_tab_c, .flags = cflags });
+        flexspin_exe.root_module.addCSourceFile(.{ .file = basic_tab_c, .flags = cflags });
+        flexspin_exe.root_module.addCSourceFile(.{ .file = cgram_tab_c, .flags = cflags });
 
         b.installArtifact(flexspin_exe);
     }
@@ -176,15 +176,15 @@ pub fn build(b: *std.Build) void {
         for (compile_defines) |define|
             flexcc_exe.root_module.addCMacro(define, "");
 
-        flexcc_exe.addCSourceFiles(.{
+        flexcc_exe.root_module.addCSourceFiles(.{
             .root = upstream,
             .files = spin_sources ++ &[_][]const u8{ "flexcc.c", "cmdline.c" },
             .flags = cflags,
         });
 
-        flexcc_exe.addCSourceFile(.{ .file = spin_tab_c, .flags = cflags });
-        flexcc_exe.addCSourceFile(.{ .file = basic_tab_c, .flags = cflags });
-        flexcc_exe.addCSourceFile(.{ .file = cgram_tab_c, .flags = cflags });
+        flexcc_exe.root_module.addCSourceFile(.{ .file = spin_tab_c, .flags = cflags });
+        flexcc_exe.root_module.addCSourceFile(.{ .file = basic_tab_c, .flags = cflags });
+        flexcc_exe.root_module.addCSourceFile(.{ .file = cgram_tab_c, .flags = cflags });
 
         b.installArtifact(flexcc_exe);
     }
